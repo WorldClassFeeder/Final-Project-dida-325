@@ -12,6 +12,11 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
+What is your imagined position on this dataset. Who has hired you, what are the overall goals?
+What is the origin of the dataset. Who recorded the data? I promise you, it wasn't a user on kaggle.
+The origin of the dataset is part of research done by the The Marshall Project. They are a nonprofit news organization that aim to produce an enviornment that expresses the national urgency about the U.S. criminal justice system. They analyzed the FBI's Uniform Reporting Program data to find which crimes were most likley to be solved. Then, they also investigated how many crimes the agencies reported and how many crimes were solved each year. 
+Explain what all of your remaining columns represent, and whether they are text, numeric, or categorical in nature. 
+
 ```{r cars}
 summary(cars)
 
@@ -26,3 +31,4 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
