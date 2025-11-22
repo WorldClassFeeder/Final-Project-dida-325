@@ -13,6 +13,7 @@ library(ggplot2)
 crime<-read.csv("C:/Users/Administrator/Desktop/DIDA_325/crime_clearance_rate.csv")
 
 
+
 ```
 #### Checkpoint 1
 
@@ -39,4 +40,60 @@ Explain what all of your remaining columns represent, and whether they are text,
 
 # The dataset also includes numeric totals such as violent_crime, property_crime, total_crimes. Lastly, all “clearance_rate_” columns are numeric percentages showing the share of cases solved for each crime type and for crime overall.
 
-```
+``` 
+
+## Variables Removed and Why
+
+To prepare the dataset for our four research questions, we removed all
+variables that did not directly relate to changes in clearance rates,
+differences between states, or prediction/classification of overall
+clearance rate.
+
+### Removed Variables
+
+**1. Identification variables (not useful for analysis)**
+- `ori`, `agency_name`, `fips_state_county_code`
+These identify agencies but do not contribute to crime patterns.
+
+**2. Cleared-case count variables**
+- All `cleared_*` columns
+We use clearance *rates* instead of counts, so these are redundant and
+introduce information leakage.
+
+**3. Crime types not included in our research questions**
+- `new_murder`, `new_manslaughter`, `new_rape`, `new_arson`,
+  `new_total_crime`
+Our focus is specifically on assault, robbery, burglary, theft, and motor
+vehicle theft.
+
+**4. Other clearance rate variables**
+- All `clearance_rate_*` variables except `clearance_rate_total_crime`
+These represent unrelated crime categories or alternate target variables.
+
+### Variables Kept
+
+We kept only variables relevant to our questions:
+
+- `state`, `year`
+- `new_assault`, `new_robbery`, `new_burglary`, `new_theft`,
+  `new_motor_vehicle_theft`
+- `clearance_rate_total_crime` (our main response variable)
+#filtered dataset
+```{r}
+crime_filtered <- crime |>
+  select(
+    state, year,
+    new_assault, new_robbery, new_burglary, new_theft, new_motor_vehicle_theft,
+    clearance_rate_total_crime
+  )
+
+``` 
+
+#### Checkpoint 2
+
+How have clearance rates for violent crimes vs. property crimes changed over time in different states, and which states show the biggest improvement or decline? (Visualization)
+Does New York differ from other states in its clearance rates for violent crime, burglary, or theft, and how do those differences change over time?
+Can overall clearance rate be predicted using crime volume variables like number of assaults, robberies, burglaries, thefts, and motor vehicle thefts? (Linear Regression)
+Can we classify whether a specific crime category (e.g., murder, robbery, burglary) will have a “high” vs. “low” clearance rate based on crime totals and state/year characteristics? (Logistic Regression or Random Forest)
+
+
