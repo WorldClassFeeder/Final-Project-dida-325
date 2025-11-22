@@ -80,12 +80,13 @@ We kept only variables relevant to our questions:
 - `clearance_rate_total_crime` (our main response variable)
 #filtered dataset
 ```{r}
-crime_filtered <- crime |>
-  select(
-    state, year,
-    new_assault, new_robbery, new_burglary, new_theft, new_motor_vehicle_theft,
-    clearance_rate_total_crime
-  )
+crime_filtered <- select(
+  crime,
+  state, year,
+  new_assault, new_robbery, new_burglary, new_theft, new_motor_vehicle_theft,
+  clearance_rate_total_crime
+)
+
 
 ``` 
 
