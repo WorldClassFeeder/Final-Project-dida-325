@@ -1,0 +1,42 @@
+---
+title: "Final Project: Riya, Daniel, Andrew, Maya"
+output: html_notebook
+---
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+
+#setwd("C:/Users/Administrator/Desktop/DIDA_325")
+crime<-read.csv("C:/Users/Administrator/Desktop/DIDA_325/crime_clearance_rate.csv")
+
+
+```
+#### Checkpoint 1
+
+What is your imagined position on this dataset. Who has hired you, what are the overall goals?
+
+```{r}
+# Our team is positioned as analysts working for the US Government. We are tasked with supporting the FBI. The goal of our efforts is to help maximize crime clearance rate by identifying potential patterns in which crimes are more likely to be solved. We can do this by understanding trends and providing actionable insights that improve investigative efficiency and resource allocation across law enforcement agencies in the US.
+
+```
+
+What is the origin of the dataset. Who recorded the data? I promise you, it wasn't a user on kaggle.
+
+```{r}
+# This dataset originates from research conducted by The Marshall Project, which is a nonprofit organization dedicated to highlighitng the national urgency surrounding the US criminal justice system. They analyzed data from the FBI's unicorm crime reporting program to determine which types of crimes are most likley to be solved. Additionally, they examined the number of criems reported by agencies and the number of cases solved each year.
+
+```
+
+Explain what all of your remaining columns represent, and whether they are text, numeric, or categorical in nature. 
+
+```{r}
+# The columns ori and agency_name are text identifiers for each police agency. State is categorical, year is numeric, and “fips_state_county_code” and “number_of_months_missing” are numeric.
+
+# The “new_” columns are numeric counts of reported crimes, and the corresponding “_cleared” columns are numeric counts of solved crimes.
+
+# The dataset also includes numeric totals such as violent_crime, property_crime, total_crimes. Lastly, all “clearance_rate_” columns are numeric percentages showing the share of cases solved for each crime type and for crime overall.
+
+```
