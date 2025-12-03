@@ -110,26 +110,6 @@ ggplot(crime_ny_ca,aes(x=year,y=total_clearance_rate,color=factor(state),group=s
   scale_y_continuous(labels=scales::comma,limits=c(5000,25000)) +
   scale_color_manual(values=c("#FFB900","#5773CC"))
 ```
-```{r}
-crime_clearance <- select(crime, state, year, clearance_rate_violent_crime, clearance_rate_burglary, clearance_rate_theft)
-
-crime_ny_ca <- crime_clearance %>%
-  drop_na() %>%
-  filter(state %in% c("new york","california")) %>%
-  filter(is.finite(clearance_rate_violent_crime), 
-         is.finite(clearance_rate_burglary), 
-         is.finite(clearance_rate_theft)) %>%
-  group_by(state,year) 
-
-ggplot(crime_ny_ca,aes(x=year,color=factor(state),group=state) + 
-  geom_line(aes(y=clearance_rate_violent_crime,color=state,line_type=state),size=2)+
-  theme_minimal() +
-  labs(x="Year",y="Clearance Rate",title="Crime Clearance Rate in New York vs California by Year",color="State",linetype="State") +
-  theme(legend.position="bottom") +
-  scale_y_continuous(labels=scales::comma,limits=c(5000,25000)) +
-  scale_color_manual(values=c("california"="red","new york"="blue")) + 
-  scale_linetype_manual(values=c("california"="solid","new york"="dashed"))
-```
 
 ```{r}
 head(crime)
