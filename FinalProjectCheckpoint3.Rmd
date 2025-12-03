@@ -1,5 +1,5 @@
 ---
-title: "Final Project: Riya, Daniel, Andrew, Maya"
+title: "Final Project: Riya, Daniel, Andrew, Maya, Lulu"
 output: html_notebook
 ---
 
@@ -121,35 +121,27 @@ crime_filtered %>% head(10)
 
 ```{r}
 #line graph, x is year, y is clearance rate, line graph shows state by color
+#Question1
 
 ggplot(crime_clean,aes(x=year,y=violent_avg,color=state))+
-  geom_line(size=1.2)+
+  geom_line(size=.8)+
+  geom_point(size=1) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
-  theme_classic()+
+  theme_minimal()+
   labs(x="year",y="clearance rate for violent crime", title="clearance rate for violent crime by the top 5 most populated states")
 
 ggplot(crime_clean,aes(x=year,y=property_avg,color=state))+
-  geom_line(size=1.2)+
+  geom_line(size=.8)+
+  geom_point(size=1) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
+  theme_minimal()+
   labs(x="year",y="clearance rate for property crime", title="clearance rate for property crime by the top 5 most populated states")
   
 ```
-```{r}
-ggplot(crime_top5pop2020,aes(x=state,y=clearance_rate_property_crime/1e5,fill=state))+
-  geom_bar(stat="Identity")+
-  theme(legend.position="none")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
-  labs(x="state",y="clearance rate for property crime", title="clearance rate for property crime by the top 5 most populated states in 2020")
-
-ggplot(crime_top5pop2020,aes(x=state,y=clearance_rate_violent_crime/1e5,fill=state))+
-  geom_bar(stat="Identity")+
-  theme(legend.position="none")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
-  labs(x="state",y="clearance rate for violent crime", title="clearance rate for violent crime by the top 5 most populated states in 2020")
-```
 
 
 ```{r}
+#Question2
 crime_ny_ca <- crime_filtered %>%
   drop_na(clearance_rate_total_crime) %>%
   filter(state %in% c("new york","california")) %>%
@@ -166,5 +158,30 @@ ggplot(crime_ny_ca,aes(x=year,y=total_clearance_rate,color=factor(state),group=s
   scale_y_continuous(labels=scales::comma,limits=c(5000,25000)) +
   scale_color_manual(values=c("#FFB900","#5773CC"))
 ```
+
+
+```{r}
+#Question3
+head(crime)
+
+crime_clean2<- crime %>% 
+  select(clearance_rate_total_crime,
+         new_assault, 
+         new_robbery, 
+         new_burglary, 
+         new_theft, 
+         new_motor_vehicle_theft) %>% 
+  mutate_all(~ifelse(is.infinite(.)| is.nan(.), NA, .)) %>% 
+  drop_na()
+
+model<-lm(clearance_rate_total_crime ~
+            new_assault+
+            new_robbery+
+            new_burglary+
+            new_theft+
+            new_motor_vehicle_theft,
+          data=crime_clean2)
+
+summary(model)
 ```
 
