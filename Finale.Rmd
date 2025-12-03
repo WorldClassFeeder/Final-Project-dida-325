@@ -4,54 +4,17 @@ output:
   html_document:
     df_print: paged
 ---
+# 1. Introduction 
+Our team is positioned as analysts working for the US Government. We are tasked with supporting the FBI. The goal of our efforts is to help maximize crime clearance rate by identifying potential patterns in which crimes are more likely to be solved. We can do this by understanding trends and providing actionable insights that improve investigative efficiency and resource allocation across law enforcement agencies in the US.
 
+This dataset originates from research conducted by The Marshall Project, which is a nonprofit organization dedicated to highlighting the national urgency surrounding the US criminal justice system. They analyzed data from the FBI's uniform crime reporting program to determine which types of crimes are most likely to be solved. Additionally, they examined the number of crimes reported by agencies and the number of cases solved each year.
 
-```{r}
-library(dplyr)
-library(ggplot2)
-library(RCurl)
-library(tidyr)
+The columns ori and agency_name are text identifiers for each police agency. State is categorical, year is numeric, and “fips_state_county_code” and “number_of_months_missing” are numeric. The “new_” columns are numeric counts of reported crimes, and the corresponding “_cleared” columns are numeric counts of solved crimes. The dataset also includes numeric totals such as violent_crime, property_crime, total_crimes. Lastly, all “clearance_rate_” columns are numeric percentages showing the share of cases solved for each crime type and for crime overall.
 
-#setwd("C:/Users/Administrator/Desktop/DIDA_325")
-crime<-read.csv("C:/Users/Administrator/Desktop/DIDA_325/crime_clearance_rate.csv")
-
-```
-#### Checkpoint 1
-
-What is your imagined position on this dataset. Who has hired you, what are the overall goals?
-
-```{r}
-# Our team is positioned as analysts working for the US Government. We are tasked with supporting the FBI. The goal of our efforts is to help maximize crime clearance rate by identifying potential patterns in which crimes are more likely to be solved. We can do this by understanding trends and providing actionable insights that improve investigative efficiency and resource allocation across law enforcement agencies in the US.
-
-```
-
-What is the origin of the dataset. Who recorded the data? I promise you, it wasn't a user on kaggle.
-
-```{r}
-# This dataset originates from research conducted by The Marshall Project, which is a nonprofit organization dedicated to highlighitng the national urgency surrounding the US criminal justice system. They analyzed data from the FBI's unicorm crime reporting program to determine which types of crimes are most likley to be solved. Additionally, they examined the number of criems reported by agencies and the number of cases solved each year.
-
-```
-
-Explain what all of your remaining columns represent, and whether they are text, numeric, or categorical in nature. 
-
-```{r}
-# The columns ori and agency_name are text identifiers for each police agency. State is categorical, year is numeric, and “fips_state_county_code” and “number_of_months_missing” are numeric.
-
-# The “new_” columns are numeric counts of reported crimes, and the corresponding “_cleared” columns are numeric counts of solved crimes.
-
-# The dataset also includes numeric totals such as violent_crime, property_crime, total_crimes. Lastly, all “clearance_rate_” columns are numeric percentages showing the share of cases solved for each crime type and for crime overall.
-
-``` 
-
-## Variables Removed and Why
-
-To prepare the dataset for our four research questions, we removed all
-variables that did not directly relate to changes in clearance rates,
-differences between states, or prediction/classification of overall
-clearance rate.
+# 2. Dataset 
+To prepare the dataset for our four research questions, we removed all variables that did not directly relate to changes in clearance rates, differences between states, or prediction/classification of overall clearance rate.
 
 ### Removed Variables
-
 **1. Identification variables (not useful for analysis)**
 - `ori`, `agency_name`, `fips_state_county_code`
 These identify agencies but do not contribute to crime patterns.
@@ -74,15 +37,24 @@ violent and property crime.
 These represent unrelated crime categories or alternate target variables.
 
 ### Variables Kept
-
 We kept only variables relevant to our questions:
-
 - `state`, `year`
 - `new_assault`, `new_robbery`, `new_burglary`, `new_theft`,
   `new_motor_vehicle_theft`
   `clearance_rate_violent_crime`,`clearance_rate_property_crime`
 - `clearance_rate_total_crime` (our main response variable)
-#filtered dataset
+
+### Loading Libraries and Data 
+```{r}
+library(dplyr)
+library(ggplot2)
+library(RCurl)
+library(tidyr)
+
+#setwd("C:/Users/Administrator/Desktop/DIDA_325")
+crime<-read.csv("C:/Users/Administrator/Desktop/DIDA_325/crime_clearance_rate.csv")
+```
+### Filtered Dataset
 ```{r}
 crime_filtered <- select(
   crime,
@@ -103,28 +75,27 @@ crime_clean <- crime_top5pop %>%
          property_avg = mean(clearance_rate_property_crime, na.rm = TRUE))
 ``` 
 
-#### Checkpoint 2
+### Research Questions
+Q1: How have clearance rates for violent crimes vs. property crimes changed over time in 5 different states with the largest population, and which states show the biggest improvement or decline? (Visualization)
 
-How have clearance rates for violent crimes vs. property crimes changed over time in 5 different states with the largest population, and which states show the biggest improvement or decline? (Visualization)
+Q2: Does New York differ from California in its clearance rates for crime and how do those differences change over time? (Visualization)
 
-Does New York differ from other states in its clearance rates for all types of crime over time? (visualization)
+Q3: Can overall clearance rate be predicted using crime volume variables like number of assaults, robberies, burglaries, thefts, and motor vehicle thefts? (Linear Regression)
 
-Can overall clearance rate be predicted using crime volume variables like number of assaults, robberies, burglaries, thefts, and motor vehicle thefts? (Linear Regression)
+Q4: Can we classify whether a specific crime category (e.g., murder, robbery, burglary) will have a “high” vs. “low” clearance rate based on crime totals and state/year characteristics? (Logistic Regression or Random Forest). A high clearance rate being 65% and above.
 
-Can we classify whether a specific crime category (e.g., murder, robbery, burglary) will have a “high” vs. “low” clearance rate based on crime totals and state/year characteristics? (Logistic Regression or Random Forest). A high clearance rate being 65% and above.
-
+# Analysis
 ```{r}
 crime_filtered %>% head(10)
-
 ```
-
+# 2.1. Question 1 
 ```{r}
 # Q1: Violent crime clearance rate over time
 # Violent crime clearance over time 
 ggplot(crime_clean, aes(x = year, y = violent_avg, color = state)) +
   geom_smooth(se = FALSE, size = 1.2) +    #i used smooth here instead of raw line produces better results)
   scale_x_continuous(breaks = seq(1970, 2020, by = 5)) +
-  scale_y_continuous(limits = c(0, 100)) +
+  scale_y_continuous(limits = c(45,75)) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
   ) +
@@ -133,19 +104,18 @@ ggplot(crime_clean, aes(x = year, y = violent_avg, color = state)) +
     y = "Average clearance rate for violent crime (%)",
     title = "Violent crime clearance rates over time\nTop 5 most populated states"
   )
+
 #Property crime clearance rates over time 
 ggplot(crime_clean, aes(x = year, y = property_avg, color = state)) +
   geom_smooth(se = FALSE, size = 1.2) +
   scale_x_continuous(breaks = seq(1970, 2020, by = 5)) +
-  scale_y_continuous(limits = c(0, 100)) +
+  scale_y_continuous(limits = c(5, 30)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
   labs(
     x = "Year",
     y = "Average clearance rate for property crime (%)",
     title = "Property crime clearance rates over time\nTop 5 most populated states"
   )
-
-  
 ```
 The line plots show how often police solved violent and property crimes from 1970 through 2020 in the five most populated states. New York keeps the highest success rate for both crime types. For violent crime it stays between 65 plus 75 percent every year. Pennsylvania ranks second and both states solve property crimes repeatedly than the other three.
 
@@ -156,7 +126,6 @@ Florida's line jumps up and down, especially in the 1990s. The sharp rises as we
 In every state the violent crime clearance rate stays higher or steadier than the property crime rate. Property-crime clearance stays low everywhere - no state reaches thirty percent in most years. The patterns indicate that state level policing methods, the steadiness of reporting and the resources given to agencies shape clearance results more than population size alone.
 
 ```{r}
-#Question2
 # Property crime (2020)
 ggplot(crime_top5pop2020, aes(x = state, y = clearance_rate_property_crime, fill = state)) +
   geom_bar(stat = "identity") +
@@ -169,7 +138,6 @@ ggplot(crime_top5pop2020, aes(x = state, y = clearance_rate_property_crime, fill
     title = "Property crime clearance rates (2020)\nTop 5 most populated states"
   )
 
-
 # Violent crime (2020)
 ggplot(crime_top5pop2020, aes(x = state, y = clearance_rate_violent_crime, fill = state)) +
   geom_bar(stat = "identity") +
@@ -181,14 +149,32 @@ ggplot(crime_top5pop2020, aes(x = state, y = clearance_rate_violent_crime, fill 
     y = "Violent crime clearance rate (%)",
     title = "Violent crime clearance rates (2020)\nTop 5 most populated states"
   )
-
-
-
 ```
 The barplots show how often police cleared violent and property crimes in 2020 for the five states with the largest populations. Pennsylvania clears the highest share of both crime types - Texas clears the lowest. Florida besides New York sit between those two extremes, with rates that differ only slightly from one another.
 
 Because every state filed a full set of numbers for 2020, the picture is not warped by gaps, unlike the long term trends asked about in Question 1. Florida's rate looks steady, since no data points are absent. Across the board the state-to-state gaps are large - yet Texas still ranks last for clearing both violent and property offences.
 
+#2.2. Question 2 
+```{r}
+#Question 2: 
+crime_ny_ca <- crime_filtered %>%
+  drop_na(clearance_rate_total_crime) %>%
+  filter(state %in% c("new york","california")) %>%
+  filter(is.finite(clearance_rate_total_crime)) %>%
+  group_by(state,year) %>%
+  summarize(avg_clearance_rate = mean(clearance_rate_total_crime))
+
+ggplot(crime_ny_ca,aes(x=year,y=avg_clearance_rate,color=factor(state),group=state)) + 
+  geom_line(size=1) + 
+  theme_minimal() +
+  labs(x="Year",y="Clearance Rate",title="Crime Clearance Rate in New York vs California by Year",color="State") +
+  theme(legend.position="bottom") +
+  scale_y_continuous(labels=scales::comma,limits=c(0,40)) +
+  scale_color_manual(values=c("#FFB900","#5773CC"))
+```
+The line chart displays how California's crime clearance rate differs from New York's crime clearance clearance rate from 1970 to 2020. New York consistently has better clearance rates in every year in comparison to California. 
+
+# 2.3. Question 3 
 ```{r}
 #filtering data for q3 and q4
 #A clean outcome variable (clearance_rate_total_crime)
@@ -253,6 +239,7 @@ crime_q4$state <- as.factor(crime_q4$state)
 nrow(crime_q4)
 ```
 
+# 2.4. Question 4
 ```{r}
 #question 4 model
 model4 <- glm(
@@ -264,8 +251,6 @@ model4 <- glm(
 summary(model4)
 #heads up this takes like 3-5 minutes to load its a lot of data
 ```
-
-
 To classify whether an agency-year had a high clearance rate (defined as for an overall clearance rate of at least 65%, we fit a logistic regression model using crime volume predictors (`new_assault`, `new_robbery`,`new_burglary`, `new_theft`, and `new_motor_vehicle_theft`) with `state` and `year` included as additional predictors. The dataset was cleaned to remove missing or infinite values, and a binary outcome variable `high_clearance` was created.
 
 The model results indicate that all five of the crime volume predictors were statistically significant (p < 0.001). Higher numbers of assaults and robberies were associated with higher odds of achieving a high clearance rate, while higher levels of burglaries, thefts, and
@@ -277,3 +262,4 @@ The null deviance dropped from 237,757 to 203,170, meaning that the model improv
 
 In sum, logistic regression suggested that crime volumes and year have statistically measurable effects on the probability of achieving a high clearance rate, but these predictors alone are not strong enough to make highly accurate classifications. Additional information—such as staffing levels, funding, community characteristics, or agency resources would probably improve the classification performance.
 
+# Conclusion 
