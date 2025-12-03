@@ -130,3 +130,27 @@ ggplot(crime_ny_ca,aes(x=year,color=factor(state),group=state) +
   scale_color_manual(values=c("california"="red","new york"="blue")) + 
   scale_linetype_manual(values=c("california"="solid","new york"="dashed"))
 ```
+
+```{r}
+head(crime)
+
+crime_clean<- crime %>% 
+  select(clearance_rate_total_crime,
+         new_assault, 
+         new_robbery, 
+         new_burglary, 
+         new_theft, 
+         new_motor_vehicle_theft) %>% 
+  mutate_all(~ifelse(is.infinite(.)| is.nan(.), NA, .)) %>% 
+  drop_na()
+
+model<-lm(clearance_rate_total_crime ~
+            new_assault+
+            new_robbery+
+            new_burglary+
+            new_theft+
+            new_motor_vehicle_theft,
+          data=crime_clean)
+
+summary(model)
+```
