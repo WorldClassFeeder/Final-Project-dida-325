@@ -147,15 +147,15 @@ crime_ny_ca <- crime_filtered %>%
   filter(state %in% c("new york","california")) %>%
   filter(is.finite(clearance_rate_total_crime)) %>%
   group_by(state,year) %>%
-  summarize(total_clearance_rate=sum(clearance_rate_total_crime)) 
+  summarize(avg_clearance_rate = mean(clearance_rate_total_crime))
 
-ggplot(crime_ny_ca,aes(x=year,y=total_clearance_rate,color=factor(state),group=state)) + 
+ggplot(crime_ny_ca,aes(x=year,y=avg_clearance_rate,color=factor(state),group=state)) + 
   geom_line(size=1) + 
   geom_point(size=2) +
   theme_minimal() +
   labs(x="Year",y="Clearance Rate",title="Crime Clearance Rate in New York vs California by Year",color="State") +
   theme(legend.position="bottom") +
-  scale_y_continuous(labels=scales::comma,limits=c(5000,25000)) +
+  scale_y_continuous(labels=scales::comma,limits=c(0,40)) +
   scale_color_manual(values=c("#FFB900","#5773CC"))
 ```
 
@@ -247,4 +247,5 @@ Most state indicator variables were not significant. This implies that, after co
 The null deviance dropped from 237,757 to 203,170, meaning that the model improves on a baseline classifier. The AIC of 203,292 provides a benchmark with which future models can be compared. Overall, the predictive strength is moderate.
 
 In sum, logistic regression suggested that crime volumes and year have statistically measurable effects on the probability of achieving a high clearance rate, but these predictors alone are not strong enough to make highly accurate classifications. Additional information—such as staffing levels, funding, community characteristics, or agency resources would probably improve the classification performance.
+
 
