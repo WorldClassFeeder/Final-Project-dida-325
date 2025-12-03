@@ -1,0 +1,250 @@
+---
+title: "Final Project: Riya, Daniel, Andrew, Maya, Lulu"
+output: html_notebook
+---
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(RCurl)
+library(tidyr)
+
+
+#setwd("C:/Users/Administrator/Desktop/DIDA_325")
+crime<-read.csv("C:/Users/Administrator/Desktop/DIDA_325/crime_clearance_rate.csv")
+
+
+
+```
+#### Checkpoint 1
+
+What is your imagined position on this dataset. Who has hired you, what are the overall goals?
+
+```{r}
+# Our team is positioned as analysts working for the US Government. We are tasked with supporting the FBI. The goal of our efforts is to help maximize crime clearance rate by identifying potential patterns in which crimes are more likely to be solved. We can do this by understanding trends and providing actionable insights that improve investigative efficiency and resource allocation across law enforcement agencies in the US.
+
+```
+
+What is the origin of the dataset. Who recorded the data? I promise you, it wasn't a user on kaggle.
+
+```{r}
+# This dataset originates from research conducted by The Marshall Project, which is a nonprofit organization dedicated to highlighitng the national urgency surrounding the US criminal justice system. They analyzed data from the FBI's unicorm crime reporting program to determine which types of crimes are most likley to be solved. Additionally, they examined the number of criems reported by agencies and the number of cases solved each year.
+
+```
+
+Explain what all of your remaining columns represent, and whether they are text, numeric, or categorical in nature. 
+
+```{r}
+# The columns ori and agency_name are text identifiers for each police agency. State is categorical, year is numeric, and “fips_state_county_code” and “number_of_months_missing” are numeric.
+
+# The “new_” columns are numeric counts of reported crimes, and the corresponding “_cleared” columns are numeric counts of solved crimes.
+
+# The dataset also includes numeric totals such as violent_crime, property_crime, total_crimes. Lastly, all “clearance_rate_” columns are numeric percentages showing the share of cases solved for each crime type and for crime overall.
+
+``` 
+
+## Variables Removed and Why
+
+To prepare the dataset for our four research questions, we removed all
+variables that did not directly relate to changes in clearance rates,
+differences between states, or prediction/classification of overall
+clearance rate.
+
+### Removed Variables
+
+**1. Identification variables (not useful for analysis)**
+- `ori`, `agency_name`, `fips_state_county_code`
+These identify agencies but do not contribute to crime patterns.
+
+**2. Cleared-case count variables**
+- All `cleared_*` columns
+We use clearance *rates* instead of counts, so these are redundant and
+introduce information leakage.
+
+**3. Crime types not included in our research questions**
+- `new_murder`, `new_manslaughter`, `new_rape`, `new_arson`,
+  `new_total_crime`
+Our focus is specifically on assault, robbery, burglary, theft, and motor
+vehicle theft. We are also focusing on clearance rate differences between 
+violent and property crime.
+
+**4. Other clearance rate variables**
+- All `clearance_rate_*` variables except `clearance_rate_total_crime`, 
+`clearance_rate_violent_crime`, and `clearance_rate_property_crime`
+These represent unrelated crime categories or alternate target variables.
+
+### Variables Kept
+
+We kept only variables relevant to our questions:
+
+- `state`, `year`
+- `new_assault`, `new_robbery`, `new_burglary`, `new_theft`,
+  `new_motor_vehicle_theft`
+  `clearance_rate_violent_crime`,`clearance_rate_property_crime`
+- `clearance_rate_total_crime` (our main response variable)
+#filtered dataset
+```{r}
+crime_filtered <- select(
+  crime,
+  state, year,
+  new_assault, new_robbery, new_burglary, new_theft, new_motor_vehicle_theft,
+  clearance_rate_total_crime, clearance_rate_violent_crime, clearance_rate_property_crime
+)
+
+crime_top5pop <- crime_filtered %>%
+  filter(state %in% c("new york", "california", "texas", "florida", "pennsylvania"))
+
+crime_top5pop2020 <- crime_filtered %>%
+  filter(state %in% c("new york", "california", "texas", "florida", "pennsylvania"), year == 2020)
+
+crime_clean <- crime_top5pop %>%
+  group_by(state, year) %>%
+  mutate(violent_avg  = mean(clearance_rate_violent_crime, na.rm = TRUE),
+         property_avg = mean(clearance_rate_property_crime, na.rm = TRUE))
+``` 
+
+#### Checkpoint 2
+
+How have clearance rates for violent crimes vs. property crimes changed over time in 5 different states with the largest population, and which states show the biggest improvement or decline? (Visualization)
+
+Does New York differ from other states in its clearance rates for all types of crime over time? (visualization)
+
+Can overall clearance rate be predicted using crime volume variables like number of assaults, robberies, burglaries, thefts, and motor vehicle thefts? (Linear Regression)
+
+Can we classify whether a specific crime category (e.g., murder, robbery, burglary) will have a “high” vs. “low” clearance rate based on crime totals and state/year characteristics? (Logistic Regression or Random Forest). A high clearance rate being 65% and above.
+
+```{r}
+crime_filtered %>% head(10)
+
+```
+
+```{r}
+#line graph, x is year, y is clearance rate, line graph shows state by color
+#Question1
+
+ggplot(crime_clean,aes(x=year,y=violent_avg,color=state))+
+  geom_line(size=.8)+
+  geom_point(size=1) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
+  theme_minimal()+
+  labs(x="year",y="clearance rate for violent crime", title="clearance rate for violent crime by the top 5 most populated states")
+
+ggplot(crime_clean,aes(x=year,y=property_avg,color=state))+
+  geom_line(size=.8)+
+  geom_point(size=1) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))+
+  theme_minimal()+
+  labs(x="year",y="clearance rate for property crime", title="clearance rate for property crime by the top 5 most populated states")
+  
+```
+
+
+```{r}
+#Question2
+crime_ny_ca <- crime_filtered %>%
+  drop_na(clearance_rate_total_crime) %>%
+  filter(state %in% c("new york","california")) %>%
+  filter(is.finite(clearance_rate_total_crime)) %>%
+  group_by(state,year) %>%
+  summarize(total_clearance_rate=sum(clearance_rate_total_crime)) 
+
+ggplot(crime_ny_ca,aes(x=year,y=total_clearance_rate,color=factor(state),group=state)) + 
+  geom_line(size=1) + 
+  geom_point(size=2) +
+  theme_minimal() +
+  labs(x="Year",y="Clearance Rate",title="Crime Clearance Rate in New York vs California by Year",color="State") +
+  theme(legend.position="bottom") +
+  scale_y_continuous(labels=scales::comma,limits=c(5000,25000)) +
+  scale_color_manual(values=c("#FFB900","#5773CC"))
+```
+
+
+```{r}
+#filtering data for q3 and q4
+#A clean outcome variable (clearance_rate_total_crime)
+#No NA, Inf, or negative values in that column
+
+crime_clean1 <- crime %>%
+  filter(
+    is.finite(clearance_rate_total_crime),
+    !is.na(clearance_rate_total_crime),
+    clearance_rate_total_crime >= 0,
+    clearance_rate_total_crime <= 100
+  )
+nrow(crime_clean1)
+
+crime_q3 <- crime_clean1 %>%
+  select(
+    clearance_rate_total_crime,
+    new_assault, new_robbery, new_burglary,
+    new_theft, new_motor_vehicle_theft
+  ) %>%
+  filter(complete.cases(.))
+
+```
+
+```{r}
+#question 3 model
+
+model3 <- lm(
+  clearance_rate_total_crime ~
+    new_assault + new_robbery + new_burglary +
+    new_theft + new_motor_vehicle_theft,
+  data = crime_q3
+)
+
+summary(model3)
+```
+We fit a linear regression model predicting overall clearance rate (`clearance_rate_total_crime`) from five crime variables:
+`new_assault`, `new_robbery`, `new_burglary`, `new_theft`, and `new_motor_vehicle_theft`. The model produced an R-squared of
+0.001724, meaning that crime volume explains only about 0.17% of variations in clearance rates. Although all predictors were significant (p &lt; 2e-16), this is likely due to the very large sample size (over 660,000 observations). The coefficients themselves are very small -for example, each reported attack is related to only a 0.00027 percentage point increase in clearance rate,showing that the practical effect of crime counts on clearance rates is minimal.
+
+Overall, though the model is statistically significant, crime volume variables are not strong predictors of overall clearance rate. This
+suggests that other factors such as agency resources, staffing levels, policies, and local context likely play a far more important role in determining clearance rates than the raw number of crimes reported.
+
+```{r}
+# High clearance = 65% or more
+crime_clean1$high_clearance <- ifelse(
+  crime_clean1$clearance_rate_total_crime >= 65, 1, 0
+)
+
+# Build dataset for Q4
+crime_q4 <- crime_clean1 %>%
+  select(
+    high_clearance,
+    new_assault, new_robbery, new_burglary,
+    new_theft, new_motor_vehicle_theft,
+    state, year
+  ) %>%
+  filter(complete.cases(.))
+
+crime_q4$state <- as.factor(crime_q4$state)
+
+nrow(crime_q4)
+```
+
+```{r}
+#question 4 model
+model4 <- glm(
+  high_clearance ~ .,
+  data = crime_q4,
+  family = "binomial"
+)
+
+summary(model4)
+```
+
+### Question 4: Logistic Regression (High vs. Low Clearance Rates)
+
+To classify whether an agency-year had a high clearance rate (defined as for an overall clearance rate of at least 65%, we fit a logistic regression model using crime volume predictors (`new_assault`, `new_robbery`,`new_burglary`, `new_theft`, and `new_motor_vehicle_theft`) with `state` and `year` included as additional predictors. The dataset was cleaned to remove missing or infinite values, and a binary outcome variable `high_clearance` was created.
+
+The model results indicate that all five of the crime volume predictors were statistically significant (p < 0.001). Higher numbers of assaults and robberies were associated with higher odds of achieving a high clearance rate, while higher levels of burglaries, thefts, and
+motor-vehicle thefts were associated with lower odds. Although these effects were statistically significant, the magnitudes of the coefficients were extremely small, indicating that crime volume has limited practical influence on clearance results.
+
+Most state indicator variables were not significant. This implies that, after controlling for crime volume, differences between states do not strongly predict whether an agency achieves a high clearance rate. A few states, including Michigan, New Hampshire, New Jersey, and Washington D.C. did show significant effects relative to the reference state.
+
+The null deviance dropped from 237,757 to 203,170, meaning that the model improves on a baseline classifier. The AIC of 203,292 provides a benchmark with which future models can be compared. Overall, the predictive strength is moderate.
+
+In sum, logistic regression suggested that crime volumes and year have statistically measurable effects on the probability of achieving a high clearance rate, but these predictors alone are not strong enough to make highly accurate classifications. Additional information—such as staffing levels, funding, community characteristics, or agency resources would probably improve the classification performance.
+
