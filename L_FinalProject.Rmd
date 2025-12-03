@@ -154,3 +154,7 @@ model<-lm(clearance_rate_total_crime ~
 
 summary(model)
 ```
+
+# Written Response: Based on the linear regression model, the total number of different types of crimes does have statistically significant relationships with the overall clearance rate. Some crimes (such as assault and robbery) are associated with slightly higher clearance rates, while others (like burglary, theft, and motor vehicle theft) are associated with lower clearance rates.
+However, the model’s R² value is extremely low (0.0003). This means that crime totals do not meaningfully predict how high a state’s clearance rate will be. The clearance rate is influenced by many factors outside of crime volume, including police resources, training, investigative practices, and state-level policies. Crime totals have statistically detectable effects, but they are not strong predictors of overall clearance rates. 
+
