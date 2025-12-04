@@ -11,6 +11,14 @@ This dataset originates from research conducted by The Marshall Project, which i
 
 The columns ori and agency_name are text identifiers for each police agency. State is categorical, year is numeric, and “fips_state_county_code” and “number_of_months_missing” are numeric. The “new_” columns are numeric counts of reported crimes, and the corresponding “_cleared” columns are numeric counts of solved crimes. The dataset also includes numeric totals such as violent_crime, property_crime, total_crimes. Lastly, all “clearance_rate_” columns are numeric percentages showing the share of cases solved for each crime type and for crime overall.
 
+Q1: How have clearance rates for violent crimes vs. property crimes changed over time in 5 different states with the largest population, and which states show the biggest improvement or decline? (Visualization)
+
+Q2: Does New York differ from California in its clearance rates for crime and how do those differences change over time? (Visualization)
+
+Q3: Can overall clearance rate be predicted using crime volume variables like number of assaults, robberies, burglaries, thefts, and motor vehicle thefts? (Linear Regression)
+
+Q4: Can we classify whether a specific crime category (e.g., murder, robbery, burglary) will have a “high” vs. “low” clearance rate based on crime totals and state/year characteristics? (Logistic Regression or Random Forest). A high clearance rate being 65% and above.
+
 # 2. Dataset 
 To prepare the dataset for our four research questions, we removed all variables that did not directly relate to changes in clearance rates, differences between states, or prediction/classification of overall clearance rate.
 
@@ -74,15 +82,6 @@ crime_clean <- crime_top5pop %>%
   mutate(violent_avg  = mean(clearance_rate_violent_crime, na.rm = TRUE),
          property_avg = mean(clearance_rate_property_crime, na.rm = TRUE))
 ``` 
-
-### Research Questions
-Q1: How have clearance rates for violent crimes vs. property crimes changed over time in 5 different states with the largest population, and which states show the biggest improvement or decline? (Visualization)
-
-Q2: Does New York differ from California in its clearance rates for crime and how do those differences change over time? (Visualization)
-
-Q3: Can overall clearance rate be predicted using crime volume variables like number of assaults, robberies, burglaries, thefts, and motor vehicle thefts? (Linear Regression)
-
-Q4: Can we classify whether a specific crime category (e.g., murder, robbery, burglary) will have a “high” vs. “low” clearance rate based on crime totals and state/year characteristics? (Logistic Regression or Random Forest). A high clearance rate being 65% and above.
 
 # Analysis
 ```{r}
@@ -262,5 +261,6 @@ The null deviance dropped from 237,757 to 203,170, meaning that the model improv
 
 In sum, logistic regression suggested that crime volumes and year have statistically measurable effects on the probability of achieving a high clearance rate, but these predictors alone are not strong enough to make highly accurate classifications. Additional information—such as staffing levels, funding, community characteristics, or agency resources would probably improve the classification performance.
 
-# Conclusion 
+# 3. Conclusion 
+
 
