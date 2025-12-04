@@ -263,3 +263,4 @@ The null deviance dropped from 237,757 to 203,170, meaning that the model improv
 In sum, logistic regression suggested that crime volumes and year have statistically measurable effects on the probability of achieving a high clearance rate, but these predictors alone are not strong enough to make highly accurate classifications. Additional information—such as staffing levels, funding, community characteristics, or agency resources would probably improve the classification performance.
 
 # Conclusion 
+
