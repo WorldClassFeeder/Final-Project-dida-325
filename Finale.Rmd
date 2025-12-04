@@ -124,35 +124,6 @@ Florida's line jumps up and down, especially in the 1990s. The sharp rises as we
 
 In every state the violent crime clearance rate stays higher or steadier than the property crime rate. Property-crime clearance stays low everywhere - no state reaches thirty percent in most years. The patterns indicate that state level policing methods, the steadiness of reporting and the resources given to agencies shape clearance results more than population size alone.
 
-```{r}
-# Property crime (2020)
-ggplot(crime_top5pop2020, aes(x = state, y = clearance_rate_property_crime, fill = state)) +
-  geom_bar(stat = "identity") +
-  scale_y_continuous(limits = c(0, 100)) +
-  theme(legend.position = "none",
-        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
-  labs(
-    x = "State",
-    y = "Property crime clearance rate (%)",
-    title = "Property crime clearance rates (2020)\nTop 5 most populated states"
-  )
-
-# Violent crime (2020)
-ggplot(crime_top5pop2020, aes(x = state, y = clearance_rate_violent_crime, fill = state)) +
-  geom_bar(stat = "identity") +
-  scale_y_continuous(limits = c(0, 100)) +
-  theme(legend.position = "none",
-        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
-  labs(
-    x = "State",
-    y = "Violent crime clearance rate (%)",
-    title = "Violent crime clearance rates (2020)\nTop 5 most populated states"
-  )
-```
-The barplots show how often police cleared violent and property crimes in 2020 for the five states with the largest populations. Pennsylvania clears the highest share of both crime types - Texas clears the lowest. Florida besides New York sit between those two extremes, with rates that differ only slightly from one another.
-
-Because every state filed a full set of numbers for 2020, the picture is not warped by gaps, unlike the long term trends asked about in Question 1. Florida's rate looks steady, since no data points are absent. Across the board the state-to-state gaps are large - yet Texas still ranks last for clearing both violent and property offences.
-
 #2.2. Question 2 
 ```{r}
 #Question 2: 
@@ -262,5 +233,6 @@ The null deviance dropped from 237,757 to 203,170, meaning that the model improv
 In sum, logistic regression suggested that crime volumes and year have statistically measurable effects on the probability of achieving a high clearance rate, but these predictors alone are not strong enough to make highly accurate classifications. Additional information—such as staffing levels, funding, community characteristics, or agency resources would probably improve the classification performance.
 
 # 3. Conclusion 
+
 
 
