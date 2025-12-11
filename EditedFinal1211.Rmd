@@ -13,7 +13,7 @@ The columns ori and agency_name are text identifiers for each police agency. Sta
 
 Q1: How have clearance rates for violent crimes vs. property crimes changed over time in 5 different states with the largest population, and which states show the biggest improvement or decline? (Visualization)
 
-Q2: Does New York differ from other states in its clearance rates for all types of crime over time? (visualization)
+Q2: Does New York differ from California in its clearance rates for all types of crime over time? (visualization)
 
 Q3: Can overall clearance rate be predicted using crime volume variables like number of assaults, robberies, burglaries, thefts, and motor vehicle thefts? (Linear Regression)
 
@@ -119,7 +119,7 @@ In every state the violent crime clearance rate stays higher or steadier than th
 
 #2.2. Question 2 
 ```{r}
-#Q2: Does New York differ from other states in its clearance rates for all types of crime over time? (visualization)
+#Q2: Does New York differ from California in its clearance rates for all types of crime over time? (visualization)
 
 crime_ny_ca <- crime_filtered %>%
   drop_na(clearance_rate_total_crime) %>%
@@ -282,4 +282,5 @@ Limitations of this study include missing data and variations in reporting pract
 ## Citations
 https://stat.ethz.ch/R-manual/R-devel/library/stats/html/lm.html used for question 3 model using the lm function
 https://ggplot2.tidyverse.org/reference/ mainly for q3 ggplot() ,geom_point(), geom_abline(), labs(). Used this one a lot
+
 https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html used for question 4 model using glm function
