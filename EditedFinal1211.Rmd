@@ -177,12 +177,28 @@ model3 <- lm(
 summary(model3)
 ```
 
-We fit a linear regression model predicting overall clearance rate (`clearance_rate_total_crime`) from five crime variables:
-`new_assault`, `new_robbery`, `new_burglary`, `new_theft`, and `new_motor_vehicle_theft`. The model produced an R-squared of
-0.001724, meaning that crime volume explains only about 0.17% of variations in clearance rates. Although all predictors were significant (p &lt; 2e-16), this is likely due to the very large sample size (over 660,000 observations). The coefficients themselves are very small -for example, each reported attack is related to only a 0.00027 percentage point increase in clearance rate,showing that the practical effect of crime counts on clearance rates is minimal.
 
-Overall, though the model is statistically significant, crime volume variables are not strong predictors of overall clearance rate. This
-suggests that other factors such as agency resources, staffing levels, policies, and local context likely play a far more important role in determining clearance rates than the raw number of crimes reported.
+```{r}
+# Q3: Visual
+crime_q3$predicted_clearance <- predict(model3)
+
+ggplot(crime_q3, aes(x = predicted_clearance, 
+                     y = clearance_rate_total_crime)) +
+  geom_point(alpha = 0.2) +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  labs(
+    x = "Predicted clearance rate (%)",
+    y = "Actual clearance rate (%)",
+    title = "Predicted vs. actual clearance rate\nLinear regression model (Q3)"
+  )
+
+```
+
+We built a straight line model that uses five crime counts: new_assault, new_robbery, new_burglary, new_theft, and new_motor_vehicle_theft - to predict the overall clearance rate. The model returned an R-squared of 0.001724; therefore, crime volume accounts for roughly 0.17 percent of the differences in clearance rates. All five predictors reached statistical significance (p < 2e-16) - yet that outcome stems mainly from the huge sample of more than 660 000 records. The slope values are tiny - one extra reported assault links to a rise of only 0.00027 percentage points in the clearance rate - the real world impact of crime counts on clearance rates is slight.
+
+Although the model passes the test for statistical significance, the crime volume variables do not predict the overall clearance rate with any strength. The figures show that factors like the money and staff an agency commands, its policies plus the local setting almost certainly shape clearance rates far more than the simple count of reported crimes.
+
+Visual assessment supports this conclusion because the predicted-versus-actual plot shows that almost all predictions stay within a narrow band of about twenty percent. The true clearance rates spread from zero to one hundred percent. A number of predictions lie below zero, which is impossible this shows that the model is misspecified. Because the points do not lie on the 1:1 reference line, the plot confirms that the linear model predicts poorly.
 
 ```{r}
 # High clearance = 65% or more
@@ -216,6 +232,27 @@ model4 <- glm(
 
 summary(model4)
 #heads up this takes like 3-5 minutes to load its a lot of data
+
+
+```
+```{r}
+# Q4: Visualizing logistic regression predictions
+
+# Turn outcome into a factor (0 vs 1)
+crime_q4$high_clearance <- as.factor(crime_q4$high_clearance)
+
+# Get predicted probabilities from the logistic model
+crime_q4$pred_prob <- predict(model4, type = "response")
+
+# Boxplot of predicted probabilities by actual outcome
+ggplot(crime_q4, aes(x = high_clearance, y = pred_prob)) +
+  geom_boxplot() +
+  labs(
+    x = "High clearance (0 = <65%, 1 = ≥65%)",
+    y = "Predicted probability of high clearance",
+    title = "Predicted probabilities by outcome\nLogistic regression model (Q4)"
+  )
+
 ```
 To classify whether an agency-year had a high clearance rate (defined as for an overall clearance rate of at least 65%, we fit a logistic regression model using crime volume predictors (`new_assault`, `new_robbery`,`new_burglary`, `new_theft`, and `new_motor_vehicle_theft`) with `state` and `year` included as additional predictors. The dataset was cleaned to remove missing or infinite values, and a binary outcome variable `high_clearance` was created.
 
@@ -228,6 +265,9 @@ The null deviance dropped from 237,757 to 203,170, meaning that the model improv
 
 In sum, logistic regression suggested that crime volumes and year have statistically measurable effects on the probability of achieving a high clearance rate, but these predictors alone are not strong enough to make highly accurate classifications. Additional information—such as staffing levels, funding, community characteristics, or agency resources would probably improve the classification performance.
 
+Visual Graph Interpretation:
+The forecast probabilities for high clearance pile up in the same zone for both sets of agencies - the logistic model fails to separate those below the 65 % mark from those above it. The picture confirms that crime volume figures carry little weight when one tries to predict whether a case will be cleared.
+
 # 3. Conclusion 
 
 Our analysis shows that violent crime clearance rates are consistently higher than property crime clearance rates across the 5 most populated states, with New York and Pennsylvania performing the best, while California and Texas were behind. While violent crime clearance rate has remained relatively stable over time, property crime clearance rates remain low in all states, rarely exceeding 30%. Such differences between states suggest that something other than crime volume is impacting clearance rates, such as structural or contextual factors.
@@ -235,3 +275,11 @@ Our analysis shows that violent crime clearance rates are consistently higher th
 When comparing New York and California, New York consistently maintains higher overall clearance rates throuought the 1970-2020 period. Predictive modeling using crime volume variables indicates that while statistically significant, these factors explain almost none of the variation in overall clearance rates. This highlights the limited practical impact of raw crime counts. Logistic regression analysis for classifying high (>= 65%) vs. low clearance rates shows modest predictive power, as crime volume, year, and state had measurable but small effects. This continues to further the idea that structural and contextual factors likely drive clearance outcomes more than crime counts alone.
 
 Limitations of this study include missing data and variations in reporting practices. Both of these factors, along with others, may impact these results. Future analysis would benefit from enriching the dataset with more contextual information. This could include information on staffing, budgets, and community information to provide context to this data. Agencies should focus on interventions that improve clearance rates, and potentially modeling their systems after those that are most successful in similar contexts. While our analysis provides some insights into crime clearance rates, more data and sophisticated modeling are necessary to guide any reccomendations for improving clearance rates.
+
+
+
+
+## Citations
+https://stat.ethz.ch/R-manual/R-devel/library/stats/html/lm.html used for question 3 model using the lm function
+https://ggplot2.tidyverse.org/reference/ mainly for q3 ggplot() ,geom_point(), geom_abline(), labs(). Used this one a lot
+https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html used for question 4 model using glm function
